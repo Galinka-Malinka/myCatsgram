@@ -19,34 +19,31 @@ public class UserService {
         return new ArrayList<>(userMap.values());
     }
 
-    public User addInUserList(User user) {
-        try {
+    public User addInUserList(User user) throws UserAlreadyExistException, InvalidEmailException {
+//        try {
             if (userMap.containsValue(user)) {
                 throw new UserAlreadyExistException("Такой пользователь уже существует");
             }
-            if (user.getEmail() == null || user.getEmail().isBlank()) {
-                throw new InvalidEmailException("Не задан Email пользователя");
-            } else {
+            checkEmail(user);
                 this.userMap.put(user.getEmail(), user);
-            }
-        } catch (UserAlreadyExistException | InvalidEmailException exception) {
-            System.out.println(exception.getMessage());
-        }
+
+//        } catch (UserAlreadyExistException | InvalidEmailException exception) {
+//            System.out.println(exception.getMessage());
+//        }
         return userMap.get(user.getEmail());
     }
 
-    public User updateOrAddInUserList(User user) {
-        try {
-            if (user.getEmail() == null || user.getEmail().isBlank()) {
-                throw new InvalidEmailException("Не задан Email пользователя");
-            } else if (userMap.containsValue(user)) {
+    public User updateOrAddInUserList(User user) throws InvalidEmailException {
+//        try {
+            checkEmail(user);
+            if (userMap.containsValue(user)) {
                 this.userMap.replace(user.getEmail(), user);
             } else {
                 this.userMap.put(user.getEmail(), user);
             }
-        } catch (InvalidEmailException e) {
-            System.out.println(e.getMessage());
-        }
+//        } catch (InvalidEmailException e) {
+//            System.out.println(e.getMessage());
+//        }
         return userMap.get(user.getEmail());
     }
 
@@ -58,8 +55,15 @@ public class UserService {
     }
 
     public User getUserByEmail(String email) {
-        System.out.println("Ищем email" + email);
-        System.out.println("Нашли: " + userMap.get(email));
+        if (email == null) {
+            return null;
+        }
         return userMap.get(email);
+    }
+
+    private void checkEmail(User user) throws InvalidEmailException {
+        if (user.getEmail() == null || user.getEmail().isBlank()) {
+            throw new InvalidEmailException("Адрес электронной почты не может быть пустым.");
+        }
     }
 }

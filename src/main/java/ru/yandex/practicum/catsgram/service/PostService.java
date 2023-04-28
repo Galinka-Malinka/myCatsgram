@@ -33,7 +33,6 @@ public class PostService {
     }
 
     public Post create(Post post) {
-        try {
             if (userService.findUserByEmail(post.getAuthor()) != null) {
                 post.setId(id + 1);
                 id++;
@@ -43,9 +42,6 @@ public class PostService {
                         "Пользователь %s не найден",
                         post.getAuthor()));
             }
-        } catch (UserNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
         return post;
     }
 
@@ -58,8 +54,6 @@ public class PostService {
 
     public List<Post> findAllByUserEmail(String friend, Integer size, String sort) {
         List<Post> postList = new ArrayList<>();
-//        try {
-//            if (userService.findUserByEmail(friend) != null) {
                 postList.stream().filter(p -> p.getAuthor().equals(friend))
                         .sorted((p0, p1)-> {
                     int compare = p0.getCreationDate().compareTo(p1.getCreationDate());
@@ -68,17 +62,6 @@ public class PostService {
                     }
                     return compare;
                 }).limit(size).collect(Collectors.toList());
-//            } else {
-//                throw new UserNotFoundException(String.format(
-//                        "Пользователь %s не найден",
-//                        friend));
-//            }
-//        } catch (UserNotFoundException e) {
-//            System.out.println(e.getMessage());
-//        }
         return  postList;
-
-
-
     }
 }

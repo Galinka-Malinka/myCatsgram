@@ -1,12 +1,13 @@
 package ru.yandex.practicum.catsgram.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.catsgram.controller.exception.IncorrectParameterException;
+import ru.yandex.practicum.catsgram.model.FriendsParameters;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
 
@@ -34,45 +35,23 @@ public class PostFeedController {
         } catch (JsonProcessingException exception) {
             throw new RuntimeException("Невалидный формат json", exception);
         }
-
-        if (friendsParameters != null) {
-            List<Post> result = new ArrayList<>();
-            for (String friend : friendsParameters.friends) {
-                result.addAll(postService.findAllByUserEmail(friend, friendsParameters.size, friendsParameters.sort));
-            }
-            return result;
-        } else {
-            throw new RuntimeException("неверно заполнены параметры");
-        }
-    }
-
-    static class FriendsParameters {
-        private String sort;
-        private Integer size;
-        private List<String> friends;
-
-        public String getSort() {
-            return sort;
+        if (friendsParameters.getSize() == null || friendsParameters.getSize() <= 0) {
+            throw new IncorrectParameterException("size");
         }
 
-        public void setSort(String sort) {
-            this.sort = sort;
+        if (friendsParameters.getSort() == null || !friendsParameters.getSort().equals("asc") || !friendsParameters.getSort().equals("desc")) {
+            throw new IncorrectParameterException("sort");
         }
 
-        public Integer getSize() {
-            return size;
+        if (friendsParameters.getFriends() == null || friendsParameters.getFriends().isEmpty()) {
+            throw new IncorrectParameterException("friends");
         }
 
-        public void setSize(Integer size) {
-            this.size = size;
+        List<Post> result = new ArrayList<>();
+        for (String friend : friendsParameters.getFriends()) {
+            result.addAll(postService.findAllByUserEmail(friend, friendsParameters.getSize(),
+                    friendsParameters.getSort()));
         }
-
-        public List<String> getFriends() {
-            return friends;
-        }
-
-        public void setFriends(List<String> friends) {
-            this.friends = friends;
-        }
+        return result;
     }
 }

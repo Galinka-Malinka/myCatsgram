@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.catsgram.controller.exception.InvalidEmailException;
+import ru.yandex.practicum.catsgram.controller.exception.UserAlreadyExistException;
 import ru.yandex.practicum.catsgram.model.User;
 import ru.yandex.practicum.catsgram.service.UserService;
 
@@ -26,12 +28,12 @@ public class UserController {
     }
 
     @PostMapping
-    public User addInUserList(@RequestBody User user) {
+    public User addInUserList(@RequestBody User user) throws UserAlreadyExistException, InvalidEmailException {
         return userService.addInUserList(user);
     }
 
     @PutMapping
-    public User updateOrAddInUserList(@RequestBody User user) {
+    public User updateOrAddInUserList(@RequestBody User user) throws InvalidEmailException {
         return userService.updateOrAddInUserList(user);
     }
 
